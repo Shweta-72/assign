@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Records</title>
+    <style>
+        /* Add your responsive styles here */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            background-color: #4CAF50;
+            color: white;
+            border: 1px solid #ddd;
+            padding: 10px 15px;
+            margin: 0 4px;
+            cursor: pointer;
+        }
+
+        .pagination button.active {
+            background-color: #45a049;
+        }
+
+        .search-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .search-container input[type=text] {
+            padding: 10px;
+            margin: 5px;
+            width: 30%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="search-container">
+    <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Search for patient names...">
+</div>
+
+<table id="patientTable">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Gender</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Sample patient records -->
+        <tr>
+            <td>1</td>
+            <td>John Doe</td>
+            <td>30</td>
+            <td>Male</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Jane Smith</td>
+            <td>25</td>
+            <td>Female</td>
+        </tr>
+        <!-- Add more patient records as needed -->
+    </tbody>
+</table>
+
+<div class="pagination" id="pagination"></div>
+
+<script>
+    // Sample patient data
+    const patients = [
+        { id: 1, name: 'John Doe', age: 30, gender: 'Male' },
+        { id: 2, name: 'Jane Smith', age: 25, gender: 'Female' },
+        // Add more patient data as needed
+    ];
+
+    const itemsPerPage = 5; // Adjust as needed
+    let currentPage = 1;
+
+    // Function to display patient records
+    function displayPatients(page) {
+        const tableBody = document.querySelector('#patientTable tbody');
+        tableBody.innerHTML = '';
+
+        const startIndex = (page - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+
+        for (let i = startIndex; i < endIndex && i < patients.length; i++) {
+            const patient = patients[i];
+            const row = `<tr>
+                            <td>${patient.id}</td>
+                            <td>${patient.name}</td>
+                            <td>${patient.age}</td>
+                            <td>${patient.gender}</td>
+                        </tr>`;
+            tableBody.innerHTML += row;
+        }
+    }
+
+    // Function to generate pagination buttons
+    function generatePaginationButtons() {
+        const paginationContainer = document.querySelector('#pagination');
+        paginationContainer.innerHTML = '';
+
+        const totalPages = Math.ceil(patients.length / itemsPerPage);
+
+        for (let i = 1; i <= totalPages; i++) {
+            const button = document.createElement('button');
+            button.innerText = i;
+            button.addEventListener('click', () => {
+                currentPage = i;
+                displayPatients(currentPage);
+                updateActiveButton();
+            });
+            paginationContainer.appendChild(button);
+        }
+
+        updateActiveButton();
+    }
+
+    // Function to update the active pagination button
+    function updateActiveButton() {
+        const buttons = document.querySelectorAll('#pagination button');
+        buttons.forEach((button, index) => {
+            if (index + 1 === currentPage) {
+                button.classList.add('active');
+            } else {
+                button.classList.remove('active');
+            }
+        });
+    }
+
+    // Function to handle search
+    function searchTable() {
+        const input = document.getElementById('searchInput');
+        const filter = input.value.toUpperCase();
+        const table = document.getElementById('patientTable');
+        const rows = table.getElementsByTagName('tr');
+
+        for (let i = 0; i < rows.length; i++) {
+            const cells = rows[i].getElementsByTagName('td');
+            let found = false;
+
+            for (let j = 0; j < cells.length; j++) {
+                const cellText = cells[j].innerText.toUpperCase();
+                if (cellText.indexOf(filter) > -1) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (found) {
+                rows[i].style.display = '';
+            } else {
+                rows[i].style.display = 'none';
+            }
+        }
+    }
+
+    // Initial display
+    displayPatients(currentPage);
+    generatePaginationButtons();
+</script>
+
+</body>
+</html>
